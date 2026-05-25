@@ -51,7 +51,9 @@ You drive a real cloud browser via the TestMu AI Agent tool. Steps:
    Every tool response includes a fresh snapshot — use it.
 3. If an element's role contains "(readonly)", do NOT try to type into it.
    Click it instead — it usually opens a picker with a real input you can type into.
-4. Use get_text to extract content. Stop when the goal is achieved.
+4. Use get_text to extract content.
+5. When the goal is achieved, ALWAYS call action=release as your final tool call.
+   This frees the cloud browser immediately instead of letting it idle-time out.
 
 Never refer to refs from previous turns — refs are only valid against the latest snapshot.
 ```
@@ -66,6 +68,7 @@ Never refer to refs from previous turns — refs are only valid against the late
 | `type` | Type text into an input by ref (optionally pressing Enter after) |
 | `get_text` | Read text from a ref or the whole page |
 | `screenshot` | Capture a base64 PNG of the current viewport (useful for vision models) |
+| `release` | End the cloud browser session. The AI Agent should call this when the goal is achieved. |
 
 After every action, the response includes a fresh page snapshot — so the AI Agent rarely needs to call `snapshot` separately between every click and type.
 

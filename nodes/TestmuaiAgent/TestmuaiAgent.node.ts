@@ -147,7 +147,7 @@ export class TestmuaiAgent implements INodeType {
 				name: 'browserVersion',
 				type: 'options',
 				default: 'latest',
-				description: '"latest" tracks the newest stable release; "latest-1" is one major version behind, and so on.',
+				description: '"latest" tracks the newest stable release; "latest-1" is one major version behind, and so on',
 				options: [
 					{ name: 'Beta', value: 'beta' },
 					{ name: 'Dev', value: 'dev' },
@@ -172,9 +172,9 @@ export class TestmuaiAgent implements INodeType {
 				displayName: 'Action',
 				name: 'action',
 				type: 'options',
-				default: '={{ $fromAI("action", "What to do in the browser. One of: navigate, snapshot, click, type, get_text, screenshot.", "string") }}',
+				default: '={{ $fromAI("action", "What to do in the browser. One of: navigate, snapshot, click, type, get_text, screenshot, release. Call release when finished to free the cloud browser.", "string") }}',
 				required: true,
-				description: 'Filled automatically by the connected AI model.',
+				description: 'Filled automatically by the connected AI model',
 				options: [
 					{
 						name: 'Click',
@@ -193,6 +193,12 @@ export class TestmuaiAgent implements INodeType {
 						value: 'navigate',
 						description: 'Open a URL in the cloud browser',
 						action: 'Open a URL in the cloud browser',
+					},
+					{
+						name: 'Release',
+						value: 'release',
+						description: 'Release the cloud browser session. Call this when the goal is achieved to avoid billing for idle time.',
+						action: 'Release the cloud browser session when finished',
 					},
 					{
 						name: 'Screenshot',
@@ -434,7 +440,7 @@ async function dispatch(
 			const ref = Number(ctx.getNodeParameter('ref', itemIndex));
 			const text = ctx.getNodeParameter('text', itemIndex) as string;
 			const submit = ctx.getNodeParameter('submit', itemIndex, false) as boolean;
-			const target = requireRef(session, ref);
+			requireRef(session, ref);
 			const elementId = await findElement(ctx, session, refSelector(ref));
 
 			// Clear existing value first so we don't append. WebDriver's clear
@@ -493,6 +499,20 @@ async function dispatch(
 				fullPage: false,
 				fullPageRequested: fullPage,
 			};
+		}
+
+		case 'release': {
+			// Cleanly end the WebDriver session so the dashboard shows the run
+			// as "Completed" rather than "Idle Timeout". Also removes the
+			// session from n8n's workflow static data so the agent can't
+			// accidentally reuse a dead session ID on a subsequent call.
+			await webdriver(ctx, session, 'DELETE', '').catch(() => {
+				// session may already be gone server-side; ignore
+			});
+			const staticData = ctx.getWorkflowStaticData('node') as StaticData;
+			const executionId = ctx.getExecutionId() || 'noexec';
+			if (staticData.sessions) delete staticData.sessions[executionId];
+			return { released: true };
 		}
 
 		default:
