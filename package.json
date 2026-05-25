@@ -1,0 +1,64 @@
+{
+  "name": "n8n-nodes-testmuai",
+  "version": "0.1.0",
+  "description": "n8n verified community node for TestMu AI (Formerly LambdaTest). Gives an AI Agent native browser tools — navigate, click, type, extract — running on TestMu's real cross-browser cloud infrastructure via the W3C WebDriver protocol.",
+  "keywords": [
+    "n8n-community-node-package",
+    "testmuai",
+    "lambdatest",
+    "browser-automation",
+    "ai-agent",
+    "webdriver",
+    "selenium"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/keys-github/n8n-nodes-testmuai",
+  "author": {
+    "name": "Harish Rajora",
+    "email": "harishr@testmuai.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keys-github/n8n-nodes-testmuai.git"
+  },
+  "bugs": {
+    "url": "https://github.com/keys-github/n8n-nodes-testmuai/issues"
+  },
+  "engines": {
+    "node": ">=18.10"
+  },
+  "scripts": {
+    "build": "tsc && node scripts/copy-icons.js",
+    "dev": "tsc --watch",
+    "format": "prettier nodes credentials --write",
+    "lint": "eslint nodes credentials package.json",
+    "lintfix": "eslint nodes credentials package.json --fix",
+    "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/TestmuaiApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/TestmuaiAgent/TestmuaiAgent.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^7.15.0",
+    "@typescript-eslint/parser": "^7.15.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-n8n-nodes-base": "^1.16.3",
+    "jsonc-eslint-parser": "^2.4.0",
+    "n8n-workflow": "^1.65.0",
+    "prettier": "^3.3.2",
+    "typescript": "^5.4.5"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
+}
