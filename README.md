@@ -4,7 +4,7 @@ Verified n8n community node for [TestMu AI Browser Cloud](https://www.testmuai.c
 
 ## What's in the package
 
-One node: **TestMu AI (Formerly LambdaTest) Agent** — a tool the n8n AI Agent calls to drive a real cloud browser. Connects to TestMu's cloud via the W3C WebDriver protocol over HTTPS, so it works inside n8n Cloud's verified-node sandbox.
+One node: **TestMu AI (Formerly LambdaTest) Agent** — a tool that any AI Agent calls to drive a real cloud browser. Connects to TestMu's cloud via the W3C WebDriver protocol over HTTPS, so it works inside n8n Cloud's verified-node sandbox.
 
 Looking for the script-runner or in-process Playwright agent? Those features live in the companion package [`n8n-nodes-browsercloud`](https://github.com/keys-github/n8n-browsercloud) (self-hosted n8n only).
 
@@ -13,7 +13,7 @@ Looking for the script-runner or in-process Playwright agent? Those features liv
 In your n8n instance:
 
 - **Self-hosted:** Settings → Community Nodes → Install → enter `n8n-nodes-testmuai`
-- **n8n Cloud:** Available in the Verified Community Nodes marketplace (after verification approval)
+- **n8n Cloud:** Available in the Verified Community Nodes marketplace.
 
 ## Credentials
 
@@ -37,7 +37,7 @@ Find both in your TestMu account profile.
 1. Add an **AI Agent** node.
 2. Wire any tool-calling-capable Chat Model (Gemini 2.5 Flash, GPT-4o, Claude Sonnet) into the Agent's Chat Model socket.
 3. Wire **TestMu AI (Formerly LambdaTest) Agent** into the Agent's Tools socket.
-4. Pick your TestMu credential on the tool node.
+4. Pick your TestMu credential (available on your TestMu AI dashboard) on the tool node.
 5. Configure browser, platform, region (US/EU), and version.
 6. Give the Agent a goal in its user message — e.g. "Open news.ycombinator.com and tell me the title of the top story."
 
@@ -53,7 +53,7 @@ You drive a real cloud browser via the TestMu AI Agent tool. Steps:
    Click it instead — it usually opens a picker with a real input you can type into.
 4. Use get_text to extract content.
 5. When the goal is achieved, ALWAYS call action=release as your final tool call.
-   This frees the cloud browser immediately instead of letting it idle-time out.
+   This frees the cloud browser immediately instead of letting it idle-time out. You can also type "Release session after completion" in natural language to achieve the same.
 
 Never refer to refs from previous turns — refs are only valid against the latest snapshot.
 ```
