@@ -12,17 +12,17 @@
     "selenium"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/keys-github/n8n-nodes-testmuai",
+  "homepage": "https://github.com/LambdaTest/n8n-nodes-testmuai",
   "author": {
     "name": "Harish Rajora",
     "email": "harishr@testmuai.com"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/keys-github/n8n-nodes-testmuai.git"
+    "url": "git+https://github.com/LambdaTest/n8n-nodes-testmuai.git"
   },
   "bugs": {
-    "url": "https://github.com/keys-github/n8n-nodes-testmuai/issues"
+    "url": "https://github.com/LambdaTest/n8n-nodes-testmuai/issues"
   },
   "engines": {
     "node": ">=18.10"
