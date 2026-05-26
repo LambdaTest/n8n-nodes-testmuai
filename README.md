@@ -77,7 +77,7 @@ After every action, the response includes a fresh page snapshot — so the AI Ag
 - Pure HTTP — no third-party Node dependencies, no subprocess spawning, no in-process Playwright. All browser interaction goes through TestMu's WebDriver Hub via n8n's sandboxed `httpRequest` helper.
 - Session state lives in n8n's workflow static data, scoped by execution ID. Stale sessions auto-prune after 30 minutes.
 - Elements are tagged with `data-n8n-ref` attributes by the snapshot script so click / type can find them again reliably via a single CSS selector lookup.
-- Live session videos and console / network logs are visible on the TestMu dashboard.
+- Live session videos and console / network logs are visible on the TestMu AI's Browsercloud dashboard.
 
 ## Limitations vs the companion `n8n-nodes-browsercloud` package
 
