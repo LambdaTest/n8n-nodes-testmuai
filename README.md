@@ -1,6 +1,6 @@
 # n8n-nodes-testmuai
 
-Verified n8n community node for [TestMu AI Browser Cloud](https://www.testmuai.com/browser-cloud/) (formerly LambdaTest). Gives your AI Agent native browser tools — navigate, click, type, extract — running on TestMu's real cross-browser cloud infrastructure.
+Verified n8n community node for [TestMu AI Browser Cloud](https://www.testmuai.com/browser-cloud/) (formerly LambdaTest). Lets your AI Agent drive real browsers — Chrome, Firefox, Safari, Edge — across Windows, macOS, and Linux. Every session runs live on the Browser Cloud dashboard with video replay, console logs, and network capture for full debugging visibility.
 
 ## What's in the package
 
