@@ -6,6 +6,8 @@ import {
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
+	JsonObject,
+	NodeApiError,
 	NodeOperationError,
 } from 'n8n-workflow';
 
@@ -296,6 +298,24 @@ export class TestmuaiAgent implements INodeType {
 					pairedItem: { item: i },
 				});
 			} catch (err) {
+				// Pass through n8n's own error types unchanged so reviewers and
+				// users see properly formatted HTTP status, response body, and
+				// headers from the upstream WebDriver Hub.
+				if (err instanceof NodeApiError || err instanceof NodeOperationError) {
+					throw err;
+				}
+
+				// HTTP failures from this.helpers.httpRequest carry statusCode /
+				// httpCode / response fields. Surface those via NodeApiError so
+				// the n8n UI shows the upstream context instead of a flat
+				// "operation failed" string.
+				const e = err as { statusCode?: number; httpCode?: string; response?: unknown };
+				if (e.statusCode !== undefined || e.httpCode !== undefined || e.response !== undefined) {
+					throw new NodeApiError(this.getNode(), err as JsonObject, { itemIndex: i });
+				}
+
+				// Anything else (internal validation / ApplicationError) stays
+				// a NodeOperationError since it's not an API failure.
 				throw new NodeOperationError(
 					this.getNode(),
 					`TestMu AI Agent (${action}) failed: ${(err as Error).message}`,
