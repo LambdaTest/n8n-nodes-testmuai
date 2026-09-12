@@ -1,5 +1,7 @@
 # n8n-nodes-testmuai
 
+📖 **Documentation:** [What is Browser Cloud?](https://www.testmuai.com/support/docs/what-is-browser-cloud/)
+
 Verified n8n community node for [TestMu AI Browser Cloud](https://www.testmuai.com/browser-cloud/) (formerly LambdaTest). Lets your AI Agent drive real browsers — Chrome, Firefox, Safari, Edge — across Windows, macOS, and Linux. Every session runs live and can be viewed on the Browser Cloud dashboard with video replay, console logs, and network capture for full debugging visibility.
 
 ## What's in the package
