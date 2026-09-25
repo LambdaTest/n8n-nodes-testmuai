@@ -55,10 +55,10 @@ module.exports = {
 			extends: ['plugin:n8n-nodes-base/nodes'],
 			rules: {
 				'n8n-nodes-base/node-class-description-icon-not-svg': 'off',
-				// We use $fromAI() expressions as defaults so n8n's AI Agent
-				// fills the action / params at runtime. The lint rule wants
-				// literal option values, which would break the integration.
-				'n8n-nodes-base/node-param-default-wrong-for-options': 'off',
+				// n8n's verification review requires NodeConnectionTypes.Main;
+				// these older rules still insist on the 'main' string literal.
+				'n8n-nodes-base/node-class-description-inputs-wrong-regular-node': 'off',
+				'n8n-nodes-base/node-class-description-outputs-wrong': 'off',
 			},
 		},
 	],

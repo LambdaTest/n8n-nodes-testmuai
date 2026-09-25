@@ -2,12 +2,14 @@ import {
 	IAuthenticateGeneric,
 	ICredentialTestRequest,
 	ICredentialType,
+	Icon,
 	INodeProperties,
 } from 'n8n-workflow';
 
 export class TestmuaiApi implements ICredentialType {
 	name = 'testmuaiApi';
 	displayName = 'TestMu AI (Formerly LambdaTest) API';
+	icon: Icon = 'file:testmuai_logo.png';
 	documentationUrl = 'https://www.testmuai.com/support/docs/';
 
 	properties: INodeProperties[] = [

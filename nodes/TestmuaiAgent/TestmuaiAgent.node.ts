@@ -8,6 +8,7 @@ import {
 	INodeTypeDescription,
 	JsonObject,
 	NodeApiError,
+	NodeConnectionTypes,
 	NodeOperationError,
 } from 'n8n-workflow';
 
@@ -107,11 +108,12 @@ export class TestmuaiAgent implements INodeType {
 		icon: 'file:testmuai_logo.png',
 		group: ['transform'],
 		version: 1,
+		subtitle: '={{$parameter["action"]}}',
 		description:
 			'Give your AI agent a real browser to work with on TestMu AI Browser Cloud. Opens URLs, clicks elements, fills forms, and captures screenshots — all through a single tool. The live session is visible on the TestMu dashboard.',
 		defaults: { name: 'TestMu AI (Formerly LambdaTest) Agent' },
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
 		usableAsTool: true,
 		credentials: [{ name: 'testmuaiApi', required: true }],
 		properties: [
@@ -133,7 +135,8 @@ export class TestmuaiAgent implements INodeType {
 				name: 'platformName',
 				type: 'options',
 				default: 'Windows 11',
-				description: 'Operating system for the cloud session. Pick a platform compatible with the browser above.',
+				description:
+					'Operating system for the cloud session. Pick a platform compatible with the browser above.',
 				options: [
 					{ name: 'Linux', value: 'Linux' },
 					{ name: 'macOS Monterey', value: 'macOS Monterey' },
@@ -149,7 +152,8 @@ export class TestmuaiAgent implements INodeType {
 				name: 'browserVersion',
 				type: 'options',
 				default: 'latest',
-				description: '"latest" tracks the newest stable release; "latest-1" is one major version behind, and so on',
+				description:
+					'"latest" tracks the newest stable release; "latest-1" is one major version behind, and so on',
 				options: [
 					{ name: 'Beta', value: 'beta' },
 					{ name: 'Dev', value: 'dev' },
@@ -164,7 +168,8 @@ export class TestmuaiAgent implements INodeType {
 				name: 'region',
 				type: 'options',
 				default: 'us',
-				description: 'TestMu cloud region. Pick whichever is closest to your users for lower latency.',
+				description:
+					'TestMu cloud region. Pick whichever is closest to your users for lower latency.',
 				options: [
 					{ name: 'US', value: 'us' },
 					{ name: 'EU', value: 'eu' },
@@ -173,103 +178,73 @@ export class TestmuaiAgent implements INodeType {
 			{
 				displayName: 'Action',
 				name: 'action',
-				type: 'options',
-				default: '={{ $fromAI("action", "What to do in the browser. One of: navigate, snapshot, click, type, get_text, screenshot, release. Call release when finished to free the cloud browser.", "string") }}',
+				// A string rather than an options dropdown: the default must be a
+				// $fromAI() expression so the AI Agent chooses the action per call,
+				// and an options parameter must default to one of its option values.
+				type: 'string',
+				default:
+					'={{ $fromAI("action", "What to do in the browser. One of: navigate, snapshot, click, type, get_text, screenshot, release. Call release when finished to free the cloud browser.", "string") }}',
 				required: true,
-				description: 'Filled automatically by the connected AI model',
-				options: [
-					{
-						name: 'Click',
-						value: 'click',
-						description: 'Click an element by its ref number from the latest snapshot',
-						action: 'Click an element by its ref number from the latest snapshot',
-					},
-					{
-						name: 'Get Text',
-						value: 'get_text',
-						description: 'Read text from a specific ref or the whole page',
-						action: 'Read text from a specific ref or the whole page',
-					},
-					{
-						name: 'Navigate',
-						value: 'navigate',
-						description: 'Open a URL in the cloud browser',
-						action: 'Open a URL in the cloud browser',
-					},
-					{
-						name: 'Release',
-						value: 'release',
-						description: 'Release the cloud browser session. Call this when the goal is achieved to avoid billing for idle time.',
-						action: 'Release the cloud browser session when finished',
-					},
-					{
-						name: 'Screenshot',
-						value: 'screenshot',
-						description: 'Capture a base64 PNG of the current page (for vision models)',
-						action: 'Capture a base64 png of the current page for vision models',
-					},
-					{
-						name: 'Snapshot',
-						value: 'snapshot',
-						description: 'Get a numbered list of clickable / fillable elements on the current page',
-						action: 'Get a numbered list of clickable / fillable elements on the current page',
-					},
-					{
-						name: 'Type',
-						value: 'type',
-						description: 'Type text into an input element by ref',
-						action: 'Type text into an input element by ref',
-					},
-				],
+				description:
+					'Filled automatically by the connected AI model. One of: navigate, snapshot, click, type, get_text, screenshot, release.',
 			},
 			{
 				displayName: 'URL',
 				name: 'url',
 				type: 'string',
-				default: '={{ $fromAI("url", "Absolute URL to open. Used when action=navigate; ignored otherwise.", "string") }}',
+				default:
+					'={{ $fromAI("url", "Absolute URL to open. Used when action=navigate; ignored otherwise.", "string") }}',
 				placeholder: 'https://example.com',
 				description: 'Filled by the AI when action=navigate',
 			},
 			{
 				displayName: 'Ref',
 				name: 'ref',
-				type: 'number',
-				// eslint-disable-next-line n8n-nodes-base/node-param-default-wrong-for-number -- the default is an $fromAI() expression so the field reaches the tool schema; n8n resolves it to a number at runtime
+				// String so the $fromAI() default type-checks; the AI still sends a
+				// number (declared in $fromAI) and execute() coerces it.
+				type: 'string',
 				default:
 					'={{ $fromAI("ref", "Ref number of the target element, taken from the most recent snapshot output. Required for click and type; optional for get_text. Run snapshot first to obtain refs.", "number", 0) }}',
-				description: 'Filled by the AI for click, type, and (optionally) get_text. Refs come from the latest snapshot.',
+				description:
+					'Filled by the AI for click, type, and (optionally) get_text. Refs come from the latest snapshot.',
 			},
 			{
 				displayName: 'Text',
 				name: 'text',
 				type: 'string',
-				default: '={{ $fromAI("text", "Text to type into the input element. Used when action=type.", "string") }}',
+				default:
+					'={{ $fromAI("text", "Text to type into the input element. Used when action=type.", "string") }}',
 				description: 'Filled by the AI when action=type',
 			},
 			{
 				displayName: 'Press Enter After Typing',
 				name: 'submit',
-				type: 'boolean',
-				// eslint-disable-next-line n8n-nodes-base/node-param-default-wrong-for-boolean -- the default is an $fromAI() expression so the field reaches the tool schema; n8n resolves it to a boolean at runtime
+				// String so the $fromAI() default type-checks; the AI still sends a
+				// boolean (declared in $fromAI) and execute() coerces it.
+				type: 'string',
 				default:
 					'={{ $fromAI("submit", "Whether to press Enter after typing, e.g. to submit a search form. Used when action=type.", "boolean", false) }}',
-				description: 'Whether to press Enter after typing (e.g. to submit a search). Filled by the AI when action=type.',
+				description:
+					'Whether to press Enter after typing (e.g. to submit a search). Filled by the AI when action=type.',
 			},
 			{
 				displayName: 'Max Text Length',
 				name: 'maxLength',
 				type: 'number',
 				default: 4000,
-				description: 'Truncate get_text result to this many characters. User setting; not filled by the AI.',
+				description:
+					'Truncate get_text result to this many characters. User setting; not filled by the AI.',
 			},
 			{
 				displayName: 'Full Page Screenshot',
 				name: 'fullPage',
-				type: 'boolean',
-				// eslint-disable-next-line n8n-nodes-base/node-param-default-wrong-for-boolean -- the default is an $fromAI() expression so the field reaches the tool schema; n8n resolves it to a boolean at runtime
+				// String so the $fromAI() default type-checks; the AI still sends a
+				// boolean (declared in $fromAI) and execute() coerces it.
+				type: 'string',
 				default:
 					'={{ $fromAI("fullPage", "Whether to capture the entire scrollable page instead of just the viewport. Used when action=screenshot.", "boolean", false) }}',
-				description: 'Whether to capture the entire scrollable page (true) or just the viewport (false). Filled by the AI when action=screenshot.',
+				description:
+					'Whether to capture the entire scrollable page (true) or just the viewport (false). Filled by the AI when action=screenshot.',
 			},
 		],
 	};
@@ -300,9 +275,13 @@ export class TestmuaiAgent implements INodeType {
 			} catch (err) {
 				// Pass through n8n's own error types unchanged so reviewers and
 				// users see properly formatted HTTP status, response body, and
-				// headers from the upstream WebDriver Hub.
-				if (err instanceof NodeApiError || err instanceof NodeOperationError) {
-					throw err;
+				// headers from the upstream WebDriver Hub. Both constructors return
+				// their argument unchanged when it is already that class.
+				if (err instanceof NodeApiError) {
+					throw new NodeApiError(this.getNode(), err as unknown as JsonObject);
+				}
+				if (err instanceof NodeOperationError) {
+					throw new NodeOperationError(this.getNode(), err);
 				}
 
 				// HTTP failures from this.helpers.httpRequest carry statusCode /
@@ -427,7 +406,10 @@ async function dispatch(
 
 		case 'snapshot': {
 			await refreshSnapshot(ctx, session);
-			return { snapshot: formatSnapshot(session), elements: session.refs as unknown as IDataObject[] };
+			return {
+				snapshot: formatSnapshot(session),
+				elements: session.refs as unknown as IDataObject[],
+			};
 		}
 
 		case 'click': {
@@ -446,7 +428,7 @@ async function dispatch(
 						args: [{ [ELEMENT_KEY]: elementId }],
 					});
 				} else {
-					throw err;
+					throw new NodeApiError(ctx.getNode(), err as JsonObject, { itemIndex });
 				}
 			}
 			await refreshSnapshot(ctx, session);
@@ -459,7 +441,7 @@ async function dispatch(
 		case 'type': {
 			const ref = Number(ctx.getNodeParameter('ref', itemIndex));
 			const text = ctx.getNodeParameter('text', itemIndex) as string;
-			const submit = ctx.getNodeParameter('submit', itemIndex, false) as boolean;
+			const submit = toBoolean(ctx.getNodeParameter('submit', itemIndex, false));
 			requireRef(session, ref);
 			const elementId = await findElement(ctx, session, refSelector(ref));
 
@@ -512,7 +494,7 @@ async function dispatch(
 			// scrolling + stitching via JS — out of scope for v1. We return the
 			// viewport-only screenshot and surface the fullPage flag so callers
 			// can know if they asked for what they didn't get.
-			const fullPage = ctx.getNodeParameter('fullPage', itemIndex, false) as boolean;
+			const fullPage = toBoolean(ctx.getNodeParameter('fullPage', itemIndex, false));
 			const res = (await webdriver(ctx, session, 'GET', '/screenshot')) as { value?: string };
 			return {
 				image: res.value ?? '',
@@ -536,7 +518,9 @@ async function dispatch(
 		}
 
 		default:
-			throw new ApplicationError(`Unknown action: ${action}`);
+			throw new ApplicationError(
+				`Unknown action: ${action}. Use one of: navigate, snapshot, click, type, get_text, screenshot, release.`,
+			);
 	}
 }
 
@@ -598,6 +582,12 @@ function requireRef(session: StoredSession, ref: number): SnapshotItem {
 		);
 	}
 	return target;
+}
+
+// ref / submit / fullPage are string parameters holding $fromAI() expressions,
+// so the resolved value may be a real boolean or its string form.
+function toBoolean(value: unknown): boolean {
+	return value === true || (typeof value === 'string' && value.trim().toLowerCase() === 'true');
 }
 
 function refSelector(ref: number): string {
